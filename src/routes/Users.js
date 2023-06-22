@@ -29,7 +29,7 @@ router.post("/register", async (req,res) =>{
 
     const emailURL = `${process.env.LOCAL_HOST}/auth/${user._id}/verify/${token.token}`;
     await SendEmail(user.email, "Email Verification", `Hi there, \n You have set ${user.email} as your registered email. Please click the link to verify your email: ` + emailURL);
-    return res.status(200).send({message: "Successfully Registered!"})
+    return res.status(200).send({message: "Successfully registered."})
     }
     catch(err)
     {
@@ -123,6 +123,32 @@ router.get("/:id/resend-verification", async (req,res)=>{
         console.log(err)
         return res.status(500).send({message: "Please contact technical support."})  
     }   
+})
+
+router.post("/reset", async (req,res) =>{
+    try
+    {
+    const { email } = req.body;
+    let user = await UsersModel.findOne({email});
+
+    if(!user){
+        return res.status(400).send({ message: "This email is not registered."});
+    }
+
+    const token = await new TokenModel({
+        userID: user._id,
+        token: jwt.sign({id: user._id}, process.env.SECRET_KEY)
+    }).save();
+
+    const emailURL = `${process.env.LOCAL_HOST}/auth/${user._id}/reset/${token.token}`;
+    await SendEmail(user.email, "Reset Password", `Hi there, \n We've received your request to reset your password. Please click the link to verify your email: ` + emailURL);
+    return res.status(200).send({message: "Reset password request sent."})
+    }
+    catch(err)
+    {
+        console.log(err);
+        return res.status(500).send({message: "Please contact technical support."})
+    }
 })
 
 router.get("/login/success", (req,res)=>{
