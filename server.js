@@ -1,5 +1,7 @@
 import express from 'express'
 import cors from 'cors'
+dotenv.config();
+const app = express();
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import cookieSession from 'cookie-session';
@@ -7,8 +9,6 @@ import passport from 'passport';
 import {PassportSetup} from './src/middlewares/Passport.js';
 import { UsersRouter } from './src/routes/Users.js';
 
-dotenv.config();
-const app = express();
 
 app.use(cookieSession({
     name: "session",
