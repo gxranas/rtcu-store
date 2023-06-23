@@ -17,7 +17,7 @@ router.post("/register", async (req,res) =>{
     let user = await UsersModel.findOne({email});
 
     if(user){
-        return res.status(400).send({ message: "This email is already taken."});
+        return res.json({ message: "This email is already taken."});
     }
 
     const hashPassword = await bcrypt.hash(password, parseInt(process.env.SALT));
@@ -29,7 +29,7 @@ router.post("/register", async (req,res) =>{
 
     const emailURL = `${process.env.LOCAL_HOST}/auth/${user._id}/verify/${token.token}`;
     await SendEmail(user.email, "Email Verification", `Hi there, \n You have set ${user.email} as your registered email. Please click the link to verify your email: ` + emailURL);
-    return res.status(200).send({message: "Successfully registered."})
+    return res.json({message: "Successfully registered."})
     }
     catch(err)
     {
@@ -45,7 +45,7 @@ router.post("/login", async (req,res) =>{
     const user = await UsersModel.findOne({email});
 
     if(!user){
-        return res.status(400).send({ message: "This user is not registered."});
+        return res.json({ message: "This user is not registered."});
     }
 
     const isValidatePassword = await bcrypt.compare(password,user.password);
@@ -68,14 +68,14 @@ router.get("/:id/verify/:token", async (req,res)=>{
     try
     {
         const user = await UsersModel.findOne({_id: req.params.id});
-        if(!user) return res.status(400).send({message: "Invalid link."});
+        if(!user) return res.json({message: "Invalid link."});
 
         const token = await TokenModel.findOne({
             userID: user._id,
             token: req.params.token,
         })
 
-        if(!token) return res.status(400).send({message: "Invalid link."});
+        if(!token) return res.json({message: "Invalid link."});
 
         await UsersModel.updateOne({
             _id: user._id,
@@ -83,7 +83,7 @@ router.get("/:id/verify/:token", async (req,res)=>{
         })
         await TokenModel.deleteMany({userID : user._id});
 
-        res.status(200).send({message: "Email successfully verified."})
+        res.json({message: "Email successfully verified."})
     }
     catch(err)
     {
@@ -106,17 +106,17 @@ router.get("/:id/resend-verification", async (req,res)=>{
             
                 const emailURL = `${process.env.LOCAL_HOST}/auth/${user._id}/verify/${token.token}`;
                 await SendEmail(user.email, "Email Verification", `Hi there, \n You have set ${user.email} as your registered email. Please click the link to verify your email: ` + emailURL);
-                return res.status(200).send({message: "Verification sent."})
+                return res.json({message: "Verification sent."})
             }
             else
             {
-                return res.status(400).send({message: "Please check your email."})
+                return res.json({message: "Please check your email."})
             }
 
         }
         else
         {
-            return res.status(200).send({message: "Email Already Verified!"})
+            return res.json({message: "Email Already Verified!"})
         }
     }
     catch(err){
@@ -132,7 +132,7 @@ router.post("/reset", async (req,res) =>{
     let user = await UsersModel.findOne({email});
 
     if(!user){
-        return res.status(400).send({ message: "This email is not registered."});
+        return res.json({ message: "This email is not registered."});
     }
 
     const token = await new TokenModel({
@@ -142,7 +142,7 @@ router.post("/reset", async (req,res) =>{
 
     const emailURL = `${process.env.LOCAL_HOST}/auth/${user._id}/reset/${token.token}`;
     await SendEmail(user.email, "Reset Password", `Hi there, \n We've received your request to reset your password. Please click the link to verify your email: ` + emailURL);
-    return res.status(200).send({message: "Reset password request sent."})
+    return res.json({message: "Reset password request sent."})
     }
     catch(err)
     {
