@@ -18,13 +18,12 @@ app.use(cookieSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(express.json());
 app.use(cors({
     origin: process.env.CLIENT_URL,
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
 }));
-
-app.use(express.json());
 app.use("/auth", UsersRouter);
 
 mongoose.connect(process.env.CONNECTION_STRING);
