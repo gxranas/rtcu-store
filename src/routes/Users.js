@@ -175,7 +175,7 @@ router.get("/logout", (req,res) =>{
     try
     {
         req.logout();
-        res.redirect(String(process.env.CLIENT_URL));
+        res.redirect(String(process.env.LOCAL_HOST));
     }catch(err){
         console.log(err)
         return res.status(500).send({message: "Please contact technical support."})  
@@ -199,7 +199,7 @@ router.get("/login/failed", (req,res)=>{
 router.get("/google",passport.authenticate("google", {scope: ["profile","email"]}));
 
 router.get("/google/callback", passport.authenticate("google", {
-    successRedirect: String(process.env.CLIENT_URL),
+    successRedirect: String(process.env.LOCAL_HOST),
     failureRedirect: "/login/failed"
 }))
 
